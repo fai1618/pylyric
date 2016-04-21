@@ -108,6 +108,6 @@ if __name__ == '__main__':
                 is_register = input()
             if is_register == 'y':
                 pass  # register lyrics
-                print("WIP")
+                print("Sorry, this is WIP.")
             elif is_register == 'n':
                 exit()
