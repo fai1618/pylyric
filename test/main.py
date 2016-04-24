@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
         print('file name  : ' + file_name)
 
-        hasLyrics = has_lyrics(album_path + '/' + file_name)  # 正しくない  register_lyricからの登録？
+        hasLyrics = has_lyrics(album_path + '/' + file_name)  # 正しくない  register_lyricからの登録時のみ？
         print('has lyrics : ' + str(hasLyrics))
 
         url = get_name_list_url_by_artist(artist, 'http://www.uta-net.com/search/')
