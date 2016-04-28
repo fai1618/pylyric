@@ -100,6 +100,7 @@ if __name__ == '__main__':
         if not lyric_or_False or hasLyrics:
             exit()
         else:
+            lyric = lyric_or_False
             print('register lyrics?(y/n): ', end='')
             is_register = input()
             while is_register is not 'y' and is_register is not 'n':
@@ -107,7 +108,6 @@ if __name__ == '__main__':
                 print('register lyrics?(y/n): ', end='')
                 is_register = input()
             if is_register == 'y':
-                pass  # register lyrics
-                print("Sorry, this is WIP.")
+                register_lyric(album_path+ '/' +file_name, lyric)
             elif is_register == 'n':
                 exit()

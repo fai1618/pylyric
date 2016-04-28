@@ -74,10 +74,11 @@ def register_lyric(file_path, lyric):
 
     # TODO:歌詞存在確認
 
-    print("file['USLT'] :")
-    print(file['USLT'])
+    print(file)
+    # print("file['USLT'] : ", file['USLT'])
     # m['USLT'] = USLT(encoding=0,lang='eng', desc='',text='TEST')
-    file['USLT'] = USLT(encoding=0, text=lyric)
+    file['USLT'] = USLT(encoding=1,lang='eng', desc='', text=lyric)
+    print("file['USLT'] : ", file['USLT'])
     file.save()
     return True
 
