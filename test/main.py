@@ -96,7 +96,7 @@ if __name__ == '__main__':
         lyric_or_False = get_lyric_by_id(get_id_by_music_name(name, url), rURL)
         print(lyric_or_False)
 
-        # test
+        # 登録が必要か判定
         if not lyric_or_False or hasLyrics:
             exit()
         else:

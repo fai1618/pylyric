@@ -72,13 +72,9 @@ def register_lyric(file_path, lyric):
     except mutagen.id3.error:
         print('mutagen.id3.error')
 
-    # TODO:歌詞存在確認
-
-    print(file)
-    # print("file['USLT'] : ", file['USLT'])
     # m['USLT'] = USLT(encoding=0,lang='eng', desc='',text='TEST')
     file['USLT'] = USLT(encoding=1,lang='eng', desc='', text=lyric)
-    print("file['USLT'] : ", file['USLT'])
+    # print("file['USLT'] : ", file['USLT'])
     file.save()
     return True
 
@@ -220,7 +216,6 @@ def get_lyric(file_path):
                 if data and data[0] == '©lyr':
                     tmp = ""
                     # TODO:例外処理
-
                     # いらないかも
                     for word in data[1]:
                         tmp += word.replace('\r', '')
