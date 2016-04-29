@@ -67,10 +67,10 @@ def register_lyric(file_path, lyric):
         print("この拡張子のファイルは未対応です: {0}".format(ext))
         return False
 
-    try:
-        file.add_tags(ID3=ID3)
-    except mutagen.id3.error:
-        print('mutagen.id3.error')
+    # try:
+    #     file.add_tags(ID3=ID3)
+    # except mutagen.id3.error:
+    #     print('mutagen.id3.error')
 
     # m['USLT'] = USLT(encoding=0,lang='eng', desc='',text='TEST')
     file['USLT'] = USLT(encoding=1,lang='eng', desc='', text=lyric)
