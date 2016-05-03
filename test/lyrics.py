@@ -12,24 +12,24 @@ from mutagen.mp3 import MP3
 from mutagen.mp4 import MP4
 
 
-def extract_extension(file_name):
+def extract_extension(file_path):
     """
     拡張子取得
-    :type file_name: str
+    :type file_path: str
     :rtype str
     """
 
-    if not file_name or not os.path.splitext(file_name)[1] or os.path.splitext(file_name)[1] == '.':
-        raise Exception("file_nameが正しくないです :{0}".format(file_name))
+    if not file_path or not os.path.splitext(file_path)[1] or os.path.splitext(file_path)[1] == '.':
+        raise Exception("file_pathが正しくないです :{0}".format(file_path))
 
-    ext = os.path.splitext(file_name)[1]
+    ext = os.path.splitext(file_path)[1]
 
     # splitextはextに'.'を含むので削除
     # 将来仕様変更で'.'を含まなくなった時のため、先頭が'.'だった時のみ削除
     if ext[0] == '.':
-        return os.path.splitext(file_name)[1][1:]
+        return os.path.splitext(file_path)[1][1:]
     else:
-        return os.path.splitext(file_name)[1]
+        return os.path.splitext(file_path)[1]
 
 
 def is_exist_file(file_path):
@@ -56,16 +56,7 @@ def register_lyric(file_path, lyric):
     if not is_exist_file(file_path):
         raise Exception("file_pathは存在しません: {0}".format(file_path))
 
-    ext = extract_extension(file_path)
-    # TODO:拡張子大文字はあり得るかも？
-    if ext == "mp3" or ext == "MP3":
-        file = MP3(filename=file_path, ID3=ID3)
-    elif ext == "m4a" or ext == "m4p" or ext == "m4b":
-        # TODO:m4b未確認
-        file = MP4(filename=file_path, ID3=ID3)
-    else:
-        print("この拡張子のファイルは未対応です: {0}".format(ext))
-        return False
+    file = parse_music_file(file_path)
 
     # try:
     #     file.add_tags(ID3=ID3)
@@ -79,19 +70,21 @@ def register_lyric(file_path, lyric):
     return True
 
 
-def parse_music_file(file_name):
+def parse_music_file(file_path):
     """
     拡張子による使う関数の振り分け
-    :param file_name : str
-    :return : instance
+    :param file_path : str
+    :return : instance or False
     """
-    ext = extract_extension(file_name)
+    ext = extract_extension(file_path)
     if ext == "mp3":
-        return MP3(filename=file_name)
-    elif ext == "m4a" or ext == "m4p":
-        return MP4(filename=file_name)
+        return MP3(filepath=file_path, ID3=ID3)
+    elif ext == "m4a" or ext == "m4p" or ext == "m4b":
+        # TODO:m4b未確認
+        return MP4(filepath=file_path, ID3=ID3)
     else:
         raise Exception("この拡張子のファイルには未対応です: " + ext)
+        return False
 
 
 def has_lyrics(file_path):
@@ -174,16 +167,7 @@ def get_lyric(file_path):
     if not is_exist_file(file_path):
         raise Exception("file_pathは存在しません: {0}".format(file_path))
 
-    ext = extract_extension(file_path)
-    # TODO:拡張子大文字はあり得る？
-    if ext == 'mp3':
-        file = MP3(filename=file_path, ID3=ID3)
-    elif ext == 'm4a' or ext == 'm4p' or ext == 'm4b':
-        # TODO:m4b未確認
-        file = MP4(filename=file_path, ID3=ID3)
-    else:
-        print("この拡張子のファイルは未対応です: {0}".format(ext))
-        return False
+    file = parse_music_file(file_path)
 
     # TODO:例外処理必要か?
     datas = file.items()
