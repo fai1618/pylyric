@@ -58,15 +58,15 @@ def register_lyric(file_path, lyric):
 
     file = parse_music_file(file_path)
 
-    # try:
-    #     file.add_tags(ID3=ID3)
-    # except mutagen.id3.error:
-    #     print('mutagen.id3.error')
+    ext = extract_extension(file_path)
+    if ext == 'mp3':
+        # m['USLT'] = USLT(encoding=0,lang='eng', desc='',text='TEST')
+        file['USLT'] = USLT(encoding=1, lang='eng', desc='', text=lyric)
+        file.save()
+    elif ext == 'm4a' or ext == 'm4p' or ext == 'm4b':
+        file['\xa9lyr'] = lyric
+        file.save()
 
-    # m['USLT'] = USLT(encoding=0,lang='eng', desc='',text='TEST')
-    file['USLT'] = USLT(encoding=1,lang='eng', desc='', text=lyric)
-    # print("file['USLT'] : ", file['USLT'])
-    file.save()
     return True
 
 
@@ -74,17 +74,16 @@ def parse_music_file(file_path):
     """
     拡張子による使う関数の振り分け
     :param file_path : str
-    :return : instance or False
+    :return : instance
     """
     ext = extract_extension(file_path)
     if ext == "mp3":
-        return MP3(filepath=file_path, ID3=ID3)
+        return MP3(file_path, ID3=ID3)
     elif ext == "m4a" or ext == "m4p" or ext == "m4b":
         # TODO:m4b未確認
-        return MP4(filepath=file_path, ID3=ID3)
+        return MP4(file_path)
     else:
         raise Exception("この拡張子のファイルには未対応です: " + ext)
-        return False
 
 
 def has_lyrics(file_path):
@@ -129,7 +128,7 @@ def has_lyrics(file_path):
         elif ext == "m4a" or ext == "m4p":
             if isinstance(data, tuple) and data:
                 # TODO:確認方法正しい?
-                if data[0] == '©lyr':
+                if data[0] == '\xa9lyr':
                     has_lyrics_tag = True
                     tmp = ""
                     # TODO:例外処理
@@ -177,6 +176,8 @@ def get_lyric(file_path):
     if not datas:
         raise Exception(("dataがありません: {0}".format(datas)))
 
+    ext = extract_extension(file_path)
+
     # TODO:仕様確認
     # dataのすべての0番目の中身がkeyになってるっぽいから、そこで判別
     for data in datas:
@@ -186,6 +187,7 @@ def get_lyric(file_path):
                 # TODO:USLTだけ確認でOK?
                 if data and data[0] == 'USLT::eng':
                     # キャリッジリターンで変数の内容が上書きされるので、改行に置換
+                    # 改行でないとダメ
                     # TODO?:mac以外で確認
                     lyric = data[1].text.replace('\r', '\n')
                     # ここまで到達したうえでlyricが空なのか確認するためのデバッグ用
@@ -197,12 +199,12 @@ def get_lyric(file_path):
             # TODO:listの判定いる？
             if isinstance(data, list) or isinstance(data, tuple):
                 # TODO:確認方法が正しいか確認
-                if data and data[0] == '©lyr':
+                if data and data[0] == '\xa9lyr':
                     tmp = ""
                     # TODO:例外処理
                     # いらないかも
                     for word in data[1]:
-                        tmp += word.replace('\r', '')
+                        tmp += word.replace('\r', '\n')
 
                     lyric = tmp
                     # ここまで到達したうえでlyricが空なのか確認するためのデバッグ用
