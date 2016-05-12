@@ -39,7 +39,7 @@ def replace_symbol_for_shell(word):
     return replaced_word
 
 
-class PurseMusicInfoException(Exception):
+class IMPLException(Exception):
     def __init__ (self, message):
         """
         引数はraise文から受け取る
@@ -47,8 +47,23 @@ class PurseMusicInfoException(Exception):
         """
         self._message = message
 
-    def __str__ (self):                      # エラーメッセージ
-        return message
+    def __str__ (self):  # エラーメッセージ
+        return self._message
+
+
+class PurseMusicInfoException(Exception):
+    def __init__ (self, info_pattern, info_value):
+        """
+        引数はraise文から受け取る
+        :param info_pattern : str
+            artist,album,nameなどの情報の種類
+        :param info_value : any
+            artist,album,nameなどの情報の中身
+        """
+        self._ptn, self._val = (info_pattern, info_value)
+
+    def __str__ (self):  # エラーメッセージ
+        return '"{0}" is not valid ({1})'.format (self._ptn, self._val)
 
 
 def isPurseMusicInfoException(info_pattern, info_value):
@@ -106,11 +121,13 @@ if __name__ == '__main__':
 
         # iTunesに登録された曲名の曲のファイル名検索    かならずしも(曲名 == ファイル名)でないため
         # TODO:ファイル名検索方法変更(シェル使わなくていいように)
-        file_name = impl('cd ' + album_path_for_shell + ' && ls ./*' + name_for_shell + '*')[0].decode()[2:-1]  # './'削除 + 改行削除
-        if not file_name:
+        impl_result = impl('cd ' + album_path_for_shell + ' && ls ./*' + name_for_shell + '*')
+        file_name = impl_result[0].decode()[2:-1]  # './'削除 + 改行削除
+        impl_error = impl_result[1].decode()
+        if impl_error and impl_error != '\n':
             print('IMPL ERROR')
             print('cd ' + album_path_for_shell + ' && ls *' + name_for_shell + '*')
-            raise print(impl('cd ' + album_path_for_shell + ' && ls *' + name_for_shell + '*'))
+            raise IMPLException(impl_error)
 
         print('file name  : ' + file_name)
 
