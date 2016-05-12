@@ -120,7 +120,7 @@ if __name__ == '__main__':
         name_for_shell = replace_symbol_for_shell(name)
 
         # iTunesに登録された曲名の曲のファイル名検索    かならずしも(曲名 == ファイル名)でないため
-        # TODO:ファイル名検索方法変更(シェル使わなくていいように)
+        # TODO:ファイル名検索方法変更(シェル使わなくていいようにしたい)
         impl_result = impl('cd ' + album_path_for_shell + ' && ls ./*' + name_for_shell + '*')
         file_name = impl_result[0].decode()[2:-1]  # './'削除 + 改行削除
         impl_error = impl_result[1].decode()
@@ -131,15 +131,13 @@ if __name__ == '__main__':
 
         print('file name  : ' + file_name)
 
-        hasLyrics = has_lyrics(album_path + '/' + file_name)  # 正しくない  register_lyricからの登録時のみ？
+        hasLyrics = has_lyrics(album_path + '/' + file_name)
         print('has lyrics : ' + str(hasLyrics))
 
         url = get_name_list_url_by_artist(artist, 'http://www.uta-net.com/search/')
-        # TODO:変数名変更
         lyric_or_False = get_lyric_by_id(get_id_by_music_name(name, url), rURL)
         print(lyric_or_False)
 
-        # 登録が必要か判定
         if not lyric_or_False or hasLyrics:
             exit()
         else:
