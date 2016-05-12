@@ -47,7 +47,7 @@ class IMPLException(Exception):
         """
         self._message = message
 
-    def __str__ (self):  # エラーメッセージ
+    def __str__ (self):
         return self._message
 
 
@@ -166,6 +166,7 @@ if __name__ == '__main__':
 
         if not lyric_or_False:
             #TODO?:raise False!!!
+            print('lyric is False')
             exit()
         else:
             file_path = album_path+ '/' +file_name
