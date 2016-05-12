@@ -1,5 +1,5 @@
 {
-    "file_search_target_directory": "$HOME/Music/iTunes/iTunes Media/Music",
+    "file_search_target_directory": "Music/iTunes/iTunes Media/Music",
     "auto_register_lyrics": false,
     "overwrite_lyrics": false,
     "search_lyrics_sites":
