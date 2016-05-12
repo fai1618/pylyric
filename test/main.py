@@ -79,6 +79,26 @@ def isPurseMusicInfoException(info_pattern, info_value):
     else:
         return False
 
+
+def check_add_lyrics_y_or_n(file_path, is_overwrite=False):  # TODO:関数名変更
+    if is_overwrite:
+        str = "overwrite lyrics?"
+    else:
+        str = "register lyrics?"
+
+    print(str + '(y/n): ', end='')
+    is_register = input()
+    while is_register is not 'y' and is_register is not 'n':
+        print('please input y or n')
+        print(str + '(y/n): ', end='')
+        is_register = input()
+    if is_register == 'y':
+        register_lyric(file_path, lyric)
+        exit()
+    elif is_register == 'n':
+        exit()
+
+
 if __name__ == '__main__':
     # TODO:itunesコマンドを内包化
     artist = impl('/usr/local/bin/itunes artist')[0].decode()
@@ -104,10 +124,16 @@ if __name__ == '__main__':
         if name[-1] == '\n':
             name = name[:-1]
 
-        rURL = 'http://www.uta-net.com/user/phplib/svg/showkasi.php'
+        if len(setting["search_lyrics_sites"]) > 1:
+            print("you can only use www.uta-net.com")
+        #歌詞検索のサイトを設定から読み込む
+        if "http://uta-net.com" in setting["search_lyrics_sites"]:
+            rURL = 'http://www.uta-net.com/user/phplib/svg/showkasi.php'
+        else:
+            print("you can only use www.uta-net.com")
+            exit()
 
-        MUSIC_FILE_ROOT_PATH = os.environ.get("HOME") + \
-            '/Music/iTunes/iTunes Media/Music'
+        MUSIC_FILE_ROOT_PATH = os.environ.get("HOME") + '/' + setting["file_search_target_directory"]
 
         print('artist     : ' + artist)
         print('album      : ' + album)
@@ -138,17 +164,20 @@ if __name__ == '__main__':
         lyric_or_False = get_lyric_by_id(get_id_by_music_name(name, url), rURL)
         print(lyric_or_False)
 
-        if not lyric_or_False or hasLyrics:
+        if not lyric_or_False:
+            #TODO?:raise False!!!
             exit()
         else:
+            file_path = album_path+ '/' +file_name
             lyric = lyric_or_False
-            print('register lyrics?(y/n): ', end='')
-            is_register = input()
-            while is_register is not 'y' and is_register is not 'n':
-                print('please input y or n')
-                print('register lyrics?(y/n): ', end='')
-                is_register = input()
-            if is_register == 'y':
-                register_lyric(album_path+ '/' +file_name, lyric)
-            elif is_register == 'n':
+
+            if hasLyrics:
+                if setting["overwrite_lyrics"]:
+                    check_add_lyrics_y_or_n(file_path ,is_overwrite=True)
                 exit()
+            else:
+                if setting["auto_register_lyrics"]:
+                    register_lyric(file_path, lyric)
+                    exit()
+                else:
+                    check_add_lyrics_y_or_n(file_path)
