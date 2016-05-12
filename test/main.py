@@ -39,10 +39,35 @@ def replace_symbol_for_shell(word):
     return replaced_word
 
 
+class PurseMusicInfoException(Exception):
+    def __init__ (self, message):
+        """
+        引数はraise文から受け取る
+        :param message : str
+        """
+        self._message = message
+
+    def __str__ (self):                      # エラーメッセージ
+        return message
+
+
+def isPurseMusicInfoException(info_pattern, info_value):
+    """
+    PurseMusicInfoException判定と例外呼び出し
+    :param info_pattern : str
+    :param info_value : any
+    :return : Bool
+    引数はPurseMusicInfoExceptionの引数と同じ
+    """
+    if not info_value or info_value == '\n':
+        raise(PurseMusicInfoException(info_pattern, info_value))
+    else:
+        return False
+
 if __name__ == '__main__':
     # TODO:itunesコマンドを内包化
-    artist = impl('/usr/local/bin/itunes artist')[0]
-    artist = artist.decode()
+    artist = impl('/usr/local/bin/itunes artist')[0].decode()
+    isPurseMusicInfoException("artist", artist)
     if str(artist[-1]) == '\n':
         artist = artist[:-1]
 
@@ -53,13 +78,14 @@ if __name__ == '__main__':
     # 曲再生中の時
     else:
         setting = settings()
-        album = impl('/usr/local/bin/itunes album')[0]
-        album = album.decode()
-        if album[-1] == '\n':
+        album = impl('/usr/local/bin/itunes album')[0].decode()
+        if album == '\n':
+            album = ''
+        elif album[-1] == '\n':
             album = album[:-1]
 
-        name = impl('/usr/local/bin/itunes name')[0]
-        name = name.decode()
+        name = impl('/usr/local/bin/itunes name')[0].decode()
+        isPurseMusicInfoException("name", name)
         if name[-1] == '\n':
             name = name[:-1]
 
