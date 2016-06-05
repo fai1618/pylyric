@@ -14,7 +14,7 @@ from mutagen.mp4 import MP4
 
 def extract_extension(file_path):
     """
-    拡張子取得
+    引数から拡張子を抜き出して返す
     :type file_path: str
     :rtype str
     """
