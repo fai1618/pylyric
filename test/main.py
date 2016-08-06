@@ -44,10 +44,10 @@ def replace_symbol_for_shell(word):
     """
     replaced_word = word
     symbols = ['"', '$', '@', '&', '\'', '(', ')', '^', '|', '[', ']',
-               '{', '}', ';', '*', '?', '<', '>', '`', ' ', '-']
+               '{', '}', ';', '*', '?', '<', '>', '`', ' ', '-', '/']
     symbols2 = [r'\"', r'\$', r'\@', r'\&', r"\'", r'\(', r'\)',
                 r'\^', r'\|', r'\[', r'\]', r'\{', r'\}', r'\;',
-                r'\*', r'\?', r'\<', r'\>', r'\`', '\ ', '\-']
+                r'\*', r'\?', r'\<', r'\>', r'\`', '\ ', '\-', '\/']
     for symbol, symbol2 in zip(symbols, symbols2):
         replaced_word = replaced_word.replace(symbol, symbol2)
     return replaced_word
