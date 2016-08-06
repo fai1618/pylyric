@@ -150,16 +150,14 @@ if __name__ == '__main__':
             exit()
 
         MUSIC_FILE_ROOT_PATH = os.environ.get("HOME") + '/' + setting["file_search_target_directory"]
+        album_path = MUSIC_FILE_ROOT_PATH + '/' + artist + '/' + album
+        # shell環境用
+        album_path_for_shell = replace_symbol_for_shell(album_path)
+        name_for_shell = replace_symbol_for_shell(name)
 
         print('artist     : ' + artist)
         print('album      : ' + album)
         print('name       : ' + name)
-
-        album_path = MUSIC_FILE_ROOT_PATH + '/' + artist + '/' + album
-
-        # shell環境用
-        album_path_for_shell = replace_symbol_for_shell(album_path)
-        name_for_shell = replace_symbol_for_shell(name)
 
         # iTunesに登録された曲名の曲のファイル名検索    かならずしも(曲名 == ファイル名)でないため
         files = os.listdir(album_path)
