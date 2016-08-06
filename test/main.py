@@ -112,12 +112,15 @@ def check_add_lyrics_y_or_n(file_path, is_overwrite=False):  # TODO:関数名変
     elif is_register == 'n':
         exit()
 
+def remove_last_new_line(str):
+    if str[-1] == '\n':
+        str = str[:-1]
+    return str
 
 if __name__ == '__main__':
     artist = itunes_command('artist')[0].decode()
     isPurseMusicInfoException("artist", artist)
-    if str(artist[-1]) == '\n':
-        artist = artist[:-1]
+    remove_last_new_line(str(artist))
 
     # 曲再生中でないとき
     if artist == 'Music is not played' or artist == 'iTunes is not Active':
@@ -129,13 +132,12 @@ if __name__ == '__main__':
         album = itunes_command('album')[0].decode()
         if album == '\n':
             album = ''
-        elif album[-1] == '\n':
-            album = album[:-1]
+        else:
+            remove_last_new_line(str(artist))
 
         name = itunes_command('name')[0].decode()
         isPurseMusicInfoException("name", name)
-        if name[-1] == '\n':
-            name = name[:-1]
+        remove_last_new_line(str(artist))
 
         if len(setting["search_lyrics_sites"]) > 1:
             print("you can only use www.uta-net.com")
