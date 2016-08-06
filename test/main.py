@@ -7,7 +7,9 @@ yamada Kouhei
 """
 import os
 import subprocess
-from lyrics import get_lyric, has_lyrics, register_lyric
+import unicodedata
+import fnmatch
+from lyrics import get_lyric, has_lyrics, register_lyric, extract_extension
 from htmltest import get_name_list_url_by_artist,\
                      get_lyric_by_id, get_id_by_music_name
 from settings import settings
@@ -17,6 +19,18 @@ def impl(cmd):
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout_data, stderr_data = p.communicate()
     return stdout_data, stderr_data, p.returncode
+
+
+def itunes_command(arg):
+    command = """
+        #!/bin/bash
+        if [ -f ~/.bash/itunes.scpt ]; then
+            echo `osascript ~/.bash/itunes.scpt {0}`
+        else
+            echo `osascript ~/.bash/itunes.scpt list`
+        fi
+    """.format(arg)
+    return impl(command)
 
 
 def replace_symbol_for_shell(word):
@@ -100,8 +114,7 @@ def check_add_lyrics_y_or_n(file_path, is_overwrite=False):  # TODO:関数名変
 
 
 if __name__ == '__main__':
-    # TODO:itunesコマンドを内包化
-    artist = impl('/usr/local/bin/itunes artist')[0].decode()
+    artist = itunes_command('artist')[0].decode()
     isPurseMusicInfoException("artist", artist)
     if str(artist[-1]) == '\n':
         artist = artist[:-1]
@@ -113,13 +126,13 @@ if __name__ == '__main__':
     # 曲再生中の時
     else:
         setting = settings()
-        album = impl('/usr/local/bin/itunes album')[0].decode()
+        album = itunes_command('album')[0].decode()
         if album == '\n':
             album = ''
         elif album[-1] == '\n':
             album = album[:-1]
 
-        name = impl('/usr/local/bin/itunes name')[0].decode()
+        name = itunes_command('name')[0].decode()
         isPurseMusicInfoException("name", name)
         if name[-1] == '\n':
             name = name[:-1]
@@ -146,14 +159,20 @@ if __name__ == '__main__':
         name_for_shell = replace_symbol_for_shell(name)
 
         # iTunesに登録された曲名の曲のファイル名検索    かならずしも(曲名 == ファイル名)でないため
-        # TODO:ファイル名検索方法変更(シェル使わなくていいようにしたい)
-        impl_result = impl('cd ' + album_path_for_shell + ' && ls ./*' + name_for_shell + '*')
-        file_name = impl_result[0].decode()[2:-1]  # './'削除 + 改行削除
-        impl_error = impl_result[1].decode()
-        if impl_error and impl_error != '\n':
-            print('IMPL ERROR')
-            print('cd ' + album_path_for_shell + ' && ls *' + name_for_shell + '*')
-            raise IMPLException(impl_error)
+        files = os.listdir(album_path)
+        for file in files:
+            ext = extract_extension(file)
+            print(name.encode())
+            print(file.encode())
+            nameE = name.encode()
+            name2 = nameE.decode()
+            print(name2.encode())
+            if fnmatch.fnmatch(file, '*{0}.'.format(name) + ext):
+                print('match!!!')
+                file_name = file
+                break
+            else:
+                print('no match!!!')
 
         print('file name  : ' + file_name)
 
@@ -161,7 +180,10 @@ if __name__ == '__main__':
         print('has lyrics : ' + str(hasLyrics))
 
         url = get_name_list_url_by_artist(artist, 'http://www.uta-net.com/search/')
-        lyric_or_False = get_lyric_by_id(get_id_by_music_name(name, url), rURL)
+        music_id_or_None = get_id_by_music_name(name, url)
+        if music_id_or_None is None:
+            exit()
+        lyric_or_False = get_lyric_by_id(music_id_or_None, rURL)
         print(lyric_or_False)
 
         if not lyric_or_False:
