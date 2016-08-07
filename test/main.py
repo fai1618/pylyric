@@ -3,7 +3,7 @@
 python3.4.3
 2016/02/29
 ここから起動する
-yamada Kouhei
+yamada kouhei
 """
 import os
 import subprocess
@@ -165,9 +165,6 @@ if __name__ == '__main__':
             ext = extract_extension(file)
             print(name.encode())
             print(file.encode())
-            nameE = name.encode()
-            name2 = nameE.decode()
-            print(name2.encode())
             if fnmatch.fnmatch(file, '*{0}.'.format(name) + ext):
                 print('match!!!')
                 file_name = file
