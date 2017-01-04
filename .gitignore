@@ -1,5 +1,5 @@
 music
 test/sample
-design.md
 *.pyc
 .idea/
+.python-version
