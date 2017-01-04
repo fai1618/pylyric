@@ -89,9 +89,8 @@ def check_add_lyrics_y_or_n(file_path, is_overwrite=False):
         is_register = input()
     if is_register == 'y':
         register_lyric(file_path, lyric)
-        exit()
     elif is_register == 'n':
-        exit()
+        pass
 
 
 def remove_last_newline(str):
@@ -164,3 +163,4 @@ if __name__ == '__main__':
                     exit()
                 else:
                     check_add_lyrics_y_or_n(file_path)
+                    exit()
