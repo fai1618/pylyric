@@ -12,11 +12,12 @@ import fnmatch
 from lyrics import get_lyric, has_lyrics, register_lyric, extract_extension
 from htmltest import get_name_list_url_by_artist,\
                      get_lyric_by_id, get_id_by_music_name
-from settings import settings
+from settings import *
 
 
 def impl(cmd):
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, shell=True,\
+    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout_data, stderr_data = p.communicate()
     return stdout_data, stderr_data, p.returncode
 
@@ -27,30 +28,10 @@ def itunes_command(arg):
         if [ -f ~/.bash/itunes.scpt ]; then
             echo `osascript ~/.bash/itunes.scpt {0}`
         else
-            echo `osascript ~/.bash/itunes.scpt list`
+            echo "itunes.scpt not found"
         fi
     """.format(arg)
     return impl(command)
-
-
-def replace_symbol_for_shell(word):
-    """
-    \"  $  @  &  '  (  )  ^  |  [  ]  {  }  ;  *  ?  <  >  `  \\ -
-    の前にバックスラッシュをつけて、shellに引数として与えた時に文字列として認識させる
-    (バックスラッシュは曲名に使われないので省く) + (空白も前にバックスラッシュをつける)
-
-    :param word : str
-    :return : str
-    """
-    replaced_word = word
-    symbols = ['"', '$', '@', '&', '\'', '(', ')', '^', '|', '[', ']',
-               '{', '}', ';', '*', '?', '<', '>', '`', ' ', '-', '/']
-    symbols2 = [r'\"', r'\$', r'\@', r'\&', r"\'", r'\(', r'\)',
-                r'\^', r'\|', r'\[', r'\]', r'\{', r'\}', r'\;',
-                r'\*', r'\?', r'\<', r'\>', r'\`', '\ ', '\-', '\/']
-    for symbol, symbol2 in zip(symbols, symbols2):
-        replaced_word = replaced_word.replace(symbol, symbol2)
-    return replaced_word
 
 
 class IMPLException(Exception):
@@ -94,7 +75,7 @@ def isPurseMusicInfoException(info_pattern, info_value):
         return False
 
 
-def check_add_lyrics_y_or_n(file_path, is_overwrite=False):  # TODO:関数名変更
+def check_add_lyrics_y_or_n(file_path, is_overwrite=False):
     if is_overwrite:
         str = "overwrite lyrics?"
     else:
@@ -140,42 +121,26 @@ if __name__ == '__main__':
         isPurseMusicInfoException("name", name)
         name = remove_last_newline(str(name))
 
+        file_path = "/" + itunes_command('location')[0].decode().split(":", 1)[1].replace(":", "/")
+        isPurseMusicInfoException("location", file_path)
+        file_path = remove_last_newline(file_path)
+
+        hasLyrics = has_lyrics(file_path)
+
+        print('artist     : ' + artist)
+        print('album      : ' + album)
+        print('name       : ' + name)
+        print('file name  : ' + file_path.split("/")[-1])
+        print('has lyrics : ' + str(hasLyrics))
+
+        #TODO:検索対象のサイト増やす
         if len(setting["search_lyrics_sites"]) > 1:
             print("you can only use www.uta-net.com")
         #歌詞検索のサイトを設定から読み込む
         if "http://uta-net.com" in setting["search_lyrics_sites"]:
             rURL = 'http://www.uta-net.com/user/phplib/svg/showkasi.php'
         else:
-            print("you can only use www.uta-net.com")
-            exit()
-
-        MUSIC_FILE_ROOT_PATH = os.environ.get("HOME") + '/' + setting["file_search_target_directory"]
-        album_path = MUSIC_FILE_ROOT_PATH + '/' + artist + '/' + album
-        # shell環境用
-        album_path_for_shell = replace_symbol_for_shell(album_path)
-        name_for_shell = replace_symbol_for_shell(name)
-
-        print('artist     : ' + artist)
-        print('album      : ' + album)
-        print('name       : ' + name)
-
-        # iTunesに登録された曲名の曲のファイル名検索    かならずしも(曲名 == ファイル名)でないため
-        files = os.listdir(album_path)
-        for file in files:
-            ext = extract_extension(file)
-            print(name.encode())
-            print(file.encode())
-            if fnmatch.fnmatch(file, '*{0}.'.format(name) + ext):
-                print('match!!!')
-                file_name = file
-                break
-            else:
-                print('no match!!!')
-
-        print('file name  : ' + file_name)
-
-        hasLyrics = has_lyrics(album_path + '/' + file_name)
-        print('has lyrics : ' + str(hasLyrics))
+            raise Exception("you can only use www.uta-net.com now")
 
         url = get_name_list_url_by_artist(artist, 'http://www.uta-net.com/search/')
         music_id_or_None = get_id_by_music_name(name, url)
@@ -185,11 +150,8 @@ if __name__ == '__main__':
         print(lyric_or_False)
 
         if not lyric_or_False:
-            #TODO?:raise False!!!
-            print('lyric is False')
-            exit()
+            raise Exception('lyrics is False')
         else:
-            file_path = album_path+ '/' +file_name
             lyric = lyric_or_False
 
             if hasLyrics:
