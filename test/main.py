@@ -1,4 +1,4 @@
-#!/Users/kohei/.pyenv/shims/python
+
 """
 python3.4.3
 2016/02/29
@@ -23,6 +23,62 @@ def impl(cmd):
 
 
 def itunes_command(arg):
+
+    appleScriptCode = """
+    on run argv
+        if application "iTunes" is running then
+            tell application "iTunes"
+                if player state is playing or player state is paused then
+                    set cmd to first item of argv
+                    if cmd = "next" then
+                        next track
+                    else if cmd = "prev" then
+                        previous track
+                    else if cmd = "forward" then
+                        fast forward
+                    else if cmd = "back" then
+                        back track
+                    else if cmd = "rewind" then
+                        rewind
+                    else if cmd = "play" then
+                        play
+                    else if cmd = "playpause" then
+                        playpause
+                    else if cmd = "pause" then
+                        pause
+                    else if cmd = "stop" then
+                        stop
+                    else if cmd = "name" then
+                        return name of current track
+                    else if cmd = "artist" then
+                        return artist of current track
+                    else if cmd = "album" then
+                        return album of current track
+                    else if cmd = "count" then
+                        return played count of current track
+                    else if cmd = "playlist" then
+                        return name of current playlist
+                    else if cmd = "lyrics" then
+                        return lyrics of current track
+                    else if cmd = "location" then
+                        return location of current track
+                    else
+                        return "next prev forward back rewind play playpause pause stop name artist album count playlist location"
+                    end if
+                else
+                    return "Music is not played"
+                end if
+            end tell
+        else
+            return "iTunes is not Active"
+        end if
+
+        tell application "iTunes"
+
+        end tell
+    end run
+    """
+
     command = """
         #!/bin/bash
         if [ -f ~/.bash/itunes.scpt ]; then
