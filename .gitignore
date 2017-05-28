@@ -1,5 +1,6 @@
 music
 test/sample
+path
 *.pyc
 .idea/
 .python-version
